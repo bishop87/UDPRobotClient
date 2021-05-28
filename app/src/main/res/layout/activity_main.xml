@@ -11,7 +11,7 @@
         android:id="@+id/address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="192.168.1.153"
+        android:text="192.168.1.193"
         android:hint="dstAddress" />
     <EditText
         android:id="@+id/port"
@@ -45,7 +45,14 @@
         android:id="@+id/state"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="un-initiated"
+        android:text="state"
+        android:textSize="20dp"/>
+
+    <TextView
+        android:id="@+id/log"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="log"
         android:textSize="20dp"/>
 
 

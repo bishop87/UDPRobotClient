@@ -3,9 +3,7 @@ package it.bishop87.udpclient;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.Message;
 import android.os.NetworkOnMainThreadException;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText editTextAddress, editTextPort;
     Button btnConnect, btnDisconnect, btnSendtest;
-    TextView textViewState;
+    TextView textViewState, textViewLog;
 
     private InetAddress dstAddr;
     private int dstPort;
@@ -52,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         editTextAddress = (EditText) findViewById(R.id.address);
         editTextPort = (EditText) findViewById(R.id.port);
         textViewState = (TextView)findViewById(R.id.state);
+        textViewLog = (TextView)findViewById(R.id.log);
 
         JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
         joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
@@ -61,20 +60,22 @@ public class MainActivity extends AppCompatActivity {
 
                 calcMotorSpeed(angle, strength);
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (socket != null && !socket.isClosed()) {
-                            try {
-                                byte[] buf = calcMotorSpeed(angle, strength);
-                                DatagramPacket packet = new DatagramPacket(buf, buf.length, dstAddr, dstPort);
-                                socket.send(packet);
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                if (socket != null && !socket.isClosed()){
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (socket != null && !socket.isClosed()) {
+                                try {
+                                    byte[] buf = calcMotorSpeed(angle, strength);
+                                    DatagramPacket packet = new DatagramPacket(buf, buf.length, dstAddr, dstPort);
+                                    socket.send(packet);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
         },200);
     }
@@ -205,12 +206,12 @@ public class MainActivity extends AppCompatActivity {
             motorSpeedB = Math.max(motorSpeedB - xMapped, 0);
         }
         // Prevent buzzing at low speeds (Adjust according to your motors. My motors couldn't start moving if PWM value was below value of 70)
-        if (motorSpeedA < 10) { motorSpeedA = 0; }
-        if (motorSpeedB < 10) { motorSpeedB = 0; }
+        if (motorSpeedA < 65) { motorSpeedA = 0; }
+        if (motorSpeedB < 65) { motorSpeedB = 0; }
 
         String output = String.format(Locale.getDefault(),"%01d,%01d,%01d,%01d,%03d,%03d", in1, in2, in3, in4, motorSpeedA, motorSpeedB);
         Log.i("calcMotorSpeed", output);
-
+        textViewLog.setText(output);
         return output.getBytes();
     }
 
